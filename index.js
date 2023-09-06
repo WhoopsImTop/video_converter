@@ -26,7 +26,7 @@ app.post("/convert", upload.single('file'), (req, res) => {
     const video = fs.readFileSync(file.path);
     const newFileName = generateUniqueId();
     //write file to temp folder
-    fs.writeFileSync("temp.mpeg", video);
+    fs.writeFileSync(__dirname + "/temp.mpeg", video);
     //convert file to mp4
     ffmpeg("temp.mpeg")
       .output(__dirname + `/public/${newFileName}.mp4`)
@@ -35,7 +35,7 @@ app.post("/convert", upload.single('file'), (req, res) => {
         //send converted file
         res.sendFile(__dirname + `/public/${newFileName}.mp4`);
         //if file is sent, delete temp files
-        fs.unlinkSync("temp.mpeg");
+        fs.unlinkSync(__dirname + "/temp.mpeg");
       })
       .on("error", function (err) {
         console.log("error: ", err);
