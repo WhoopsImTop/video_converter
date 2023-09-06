@@ -40,14 +40,18 @@ app.post("/convert", (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-
 function generateUniqueId() {
-    let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let result = "";
-    for (let i = 32; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
-    return result;
+  let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "";
+  for (let i = 32; i > 0; --i)
+    result += chars[Math.floor(Math.random() * chars.length)];
+  return result;
 }
