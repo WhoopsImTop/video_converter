@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
-ffmpeg.setFfmpegPath("C:/ffmpeg/bin/ffmpeg.exe");
-/* ffmpeg.setFfmpegPath("/usr/bin/ffmpeg"); */
+/* ffmpeg.setFfmpegPath("C:/ffmpeg/bin/ffmpeg.exe"); */
+ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 
 var bodyParser = require('body-parser');
 const multer = require('multer');
