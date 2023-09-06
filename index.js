@@ -29,7 +29,7 @@ app.post("/convert", upload.single('file'), (req, res) => {
     fs.writeFileSync("temp.mpeg", video);
     //convert file to mp4
     ffmpeg("temp.mpeg")
-      .output(__dirname + `public/${newFileName}.mp4`)
+      .output(__dirname + `/public/${newFileName}.mp4`)
       .on("end", function () {
         console.log("conversion ended");
         //send converted file
