@@ -3,7 +3,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
-ffmpeg.setFfmpegPath("C:/ffmpeg/bin/ffmpeg.exe");
+/* ffmpeg.setFfmpegPath("C:/ffmpeg/bin/ffmpeg.exe"); */
+ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 
 const app = express();
 const port = 3000;
