@@ -1,23 +1,29 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
-/* ffmpeg.setFfmpegPath("C:/ffmpeg/bin/ffmpeg.exe"); */
-ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
+ffmpeg.setFfmpegPath("C:/ffmpeg/bin/ffmpeg.exe");
+/* ffmpeg.setFfmpegPath("/usr/bin/ffmpeg"); */
+
+var bodyParser = require('body-parser');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' })
 
 const app = express();
 const port = 3000;
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
 app.use(cors());
 
-app.post("/convert", (req, res) => {
+// for parsing application/json
+app.use(bodyParser.json()); 
+
+// for parsing application/xwww-
+app.use(bodyParser.urlencoded({ extended: true })); 
+
+app.post("/convert", upload.single('file'), (req, res) => {
   try {
-    const { url } = req.body;
-    const video = fs.readFileSync(url);
+    let file = req.file;
+    const video = fs.readFileSync(file.path);
     const newFileName = generateUniqueId();
     //write file to temp folder
     fs.writeFileSync("temp.mpeg", video);
