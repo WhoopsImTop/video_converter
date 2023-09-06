@@ -25,16 +25,15 @@ app.post("/convert", upload.single('file'), (req, res) => {
     let file = req.file;
     const fileName = file.originalname;
     const video = fs.readFileSync(file.path);
-    const newFileName = generateUniqueId();
     //write file to temp folder
     fs.writeFileSync(__dirname + "/" + fileName + ".mpeg", video);
     //convert file to mp4
     ffmpeg(__dirname + "/" + fileName + ".mpeg")
-      .output(__dirname + `/public/${newFileName}.mp4`)
+      .output(__dirname + `/public/${fileName}.mp4`)
       .on("end", function () {
         console.log("conversion ended");
         //send converted file
-        res.sendFile(__dirname + `/public/${newFileName}.mp4`);
+        res.sendFile(__dirname + `/public/${fileName}.mp4`);
         //if file is sent, delete temp files
         fs.unlinkSync(__dirname + "/" + fileName + ".mpeg");
       })
@@ -55,11 +54,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-function generateUniqueId() {
-  let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let result = "";
-  for (let i = 32; i > 0; --i)
-    result += chars[Math.floor(Math.random() * chars.length)];
-  return result;
-}
