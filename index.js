@@ -32,7 +32,7 @@ app.post("/convert", upload.single("file"), (req, res) => {
     ffmpeg(__dirname + "/" + fileName + ".mpeg")
       .output(__dirname + `/public/${fileName}.mp4`)
       .on("end", function () {
-        const response = sendToClientServer(fileName);
+        const response = sendToClientServer(fileName, req.token);
         res.send(response);
       })
       .on("error", function (err) {
@@ -53,7 +53,7 @@ app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-function sendToClientServer(fileName) {
+function sendToClientServer(fileName, token) {
   //post data to https://api.eks-kanalsanierung.de/public/api/files
   const url = "https://api.eks-kanalsanierung.de/public/api/files";
   const data = {
@@ -62,6 +62,7 @@ function sendToClientServer(fileName) {
   const config = {
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
     },
   };
   axios
