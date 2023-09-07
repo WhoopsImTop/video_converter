@@ -24,7 +24,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
     let file = req.file;
-    let token = req.token;
+    //get token from request
+    const token = req.body.token;
     const fileName = file.originalname.split(".")[0];
     const video = fs.readFileSync(file.path);
     //write file to temp folder
