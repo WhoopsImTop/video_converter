@@ -62,7 +62,7 @@ function sendToClientServer(fileName, token) {
   const config = {
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   };
   axios
