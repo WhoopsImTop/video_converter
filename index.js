@@ -26,7 +26,6 @@ app.post("/convert", upload.single("file"), (req, res) => {
     let file = req.file;
     //get token from request
     const token = req.body.token;
-    console.log("token: ", token);
     const fileName = file.originalname.split(".")[0];
     const video = fs.readFileSync(file.path);
     //write file to temp folder
@@ -58,8 +57,9 @@ app.listen(port, () => {
 function sendToClientServer(fileName, token) {
   //post data to https://api.eks-kanalsanierung.de/public/api/files
   const url = "https://api.eks-kanalsanierung.de/public/api/files";
+  let file = fs.readFileSync(__dirname + `/public/${fileName}.mp4`);
   const data = {
-    name: fileName,
+    file: file,
   };
   const config = {
     headers: {
