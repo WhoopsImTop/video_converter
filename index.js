@@ -22,11 +22,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/convert", upload.single("file"), (req, res) => {
-  req.setTimeout(3600000);
   try {
+    console.log("incoming Request", new Date().now());
     let file = req.file;
     //get token from request
-    const token = req.body.token;
+    const file_id = req.body.file_id;
     const fileName = file.originalname.split(".")[0];
     const video = fs.readFileSync(file.path);
     //write file to temp folder
@@ -35,12 +35,8 @@ app.post("/convert", upload.single("file"), (req, res) => {
     ffmpeg(__dirname + "/" + fileName + ".mpeg")
       .output(__dirname + `/public/${fileName}.mp4`)
       .on("end", function () {
-        const response = sendToClientServer(fileName, token);
+        const response = sendToClientServer(fileName, file_id);
         res.send(response);
-      })
-      .on("progress", function (progress) {
-        //send proccess to client
-        res.send({ progress: progress.percent, message: "In Bearbeitung" });
       })
       .on("error", function (err) {
         console.log("error: ", err);
@@ -59,9 +55,9 @@ app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-function sendToClientServer(fileName, token) {
+function sendToClientServer(fileName, file_id) {
   //post data to https://api.eks-kanalsanierung.de/public/api/files
-  const url = "https://api.eks-kanalsanierung.de/public/api/files";
+  const url = "https://api.eks-kanalsanierung.de/public/api/files-replace";
   const options = {
     method: "POST",
     url: url,
@@ -70,6 +66,7 @@ function sendToClientServer(fileName, token) {
       Authorization: "Bearer " + token,
     },
     formData: {
+      file_id: fileName,
       file: fs.createReadStream(__dirname + `/public/${fileName}.mp4`),
     },
   };
