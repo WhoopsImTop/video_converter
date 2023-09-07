@@ -74,6 +74,7 @@ function sendToClientServer(fileName, token) {
       console.log("Error : ", err);
       return;
     }
+    console.log(" Body : ", body);
     return body;
   });
 }
