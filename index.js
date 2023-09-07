@@ -8,7 +8,10 @@ ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 
 var bodyParser = require("body-parser");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/", limits: { fieldSize: 25 * 1024 * 1024 } });
+const upload = multer({
+  dest: "uploads/",
+  limits: { fieldSize: 25 * 1024 * 1024 },
+});
 
 const app = express();
 const port = 3000;
@@ -37,6 +40,9 @@ app.post("/convert", upload.single("file"), (req, res) => {
       .on("end", function () {
         const response = sendToClientServer(fileName, file_id);
         res.send(response);
+      })
+      .on("progress", function (progress) {
+        console.log("Processing: " + progress.percent + "% done");
       })
       .on("error", function (err) {
         console.log("error: ", err);
