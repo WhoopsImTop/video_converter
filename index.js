@@ -9,8 +9,7 @@ ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 var bodyParser = require("body-parser");
 const multer = require("multer");
 const upload = multer({
-  dest: "uploads/",
-  limits: { fieldSize: 25 * 1024 * 1024 },
+  dest: "uploads/"
 });
 
 const app = express();
