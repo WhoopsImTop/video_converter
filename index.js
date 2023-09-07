@@ -8,9 +8,7 @@ ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 
 var bodyParser = require("body-parser");
 const multer = require("multer");
-const upload = multer({
-  dest: "uploads/"
-});
+const upload = multer({ dest: "uploads/" });
 
 const app = express();
 const port = 3000;
@@ -25,7 +23,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
-    console.log("incoming Request", new Date().now());
     let file = req.file;
     //get token from request
     const file_id = req.body.file_id;
@@ -40,11 +37,11 @@ app.post("/convert", upload.single("file"), (req, res) => {
         const response = sendToClientServer(fileName, file_id);
         res.send(response);
       })
-      .on("progress", function (progress) {
-        console.log("Processing: " + progress.percent + "% done");
-      })
       .on("error", function (err) {
         console.log("error: ", err);
+      })
+      .on("progress", function (progress) {
+        console.log("progress: ", progress);
       })
       .run();
   } catch (e) {
