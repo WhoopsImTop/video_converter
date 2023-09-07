@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
-const axios = require("axios");
+const request = require("request");
 /* ffmpeg.setFfmpegPath("C:/ffmpeg/bin/ffmpeg.exe"); */
 ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 
@@ -57,23 +57,23 @@ app.listen(port, () => {
 function sendToClientServer(fileName, token) {
   //post data to https://api.eks-kanalsanierung.de/public/api/files
   const url = "https://api.eks-kanalsanierung.de/public/api/files";
-  let file = fs.readFileSync(__dirname + `/public/${fileName}.mp4`);
-  const data = {
-    file: file,
-  };
-  const config = {
+  const options = {
+    method: "POST",
+    url: url,
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+      Authorization: "Bearer " + token,
+    },
+    formData: {
+      file: fs.createReadStream(__dirname + `/public/${fileName}.mp4`),
     },
   };
-  axios
-    .post(url, data, config)
-    .then((response) => {
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+
+  request(options, function (err, res, body) {
+    if (err) {
+      console.log("Error : ", err);
+      return;
+    }
+    return body;
+  });
 }
