@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
     let file = req.file;
-    const fileName = file.originalname;
+    const fileName = file.originalname.split(".")[0];
     const video = fs.readFileSync(file.path);
     //write file to temp folder
     fs.writeFileSync(__dirname + "/" + fileName + ".mpeg", video);
@@ -54,22 +54,23 @@ app.listen(port, () => {
 });
 
 function sendToClientServer(fileName) {
-  let formData = new FormData();
-  formData.append(
-    "file",
-    fs.createReadStream(__dirname + `/public/${fileName}.mp4`)
-  );
+  //post data to https://api.eks-kanalsanierung.de/public/api/files
+  const url = "https://api.eks-kanalsanierung.de/public/api/files";
+  const data = {
+    name: fileName,
+  };
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
   axios
-    .post("https://api.eks-kanalsanierung.de/public/api/files", {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      data: formData,
+    .post(url, data, config)
+    .then((response) => {
+      console.log(response.data);
+      return response.data;
     })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
+    .catch((error) => {
+      console.log(error);
     });
 }
