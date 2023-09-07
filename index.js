@@ -37,6 +37,10 @@ app.post("/convert", upload.single("file"), (req, res) => {
         const response = sendToClientServer(fileName, token);
         res.send(response);
       })
+      .on("progress", function (progress) {
+        console.log("Processing: " + progress.percent + "% done");
+        res.write("Processing: " + progress.percent + "% done");
+      })
       .on("error", function (err) {
         console.log("error: ", err);
       })
