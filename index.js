@@ -24,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
     let file = req.file;
+    let token = req.token;
     const fileName = file.originalname.split(".")[0];
     const video = fs.readFileSync(file.path);
     //write file to temp folder
@@ -32,7 +33,7 @@ app.post("/convert", upload.single("file"), (req, res) => {
     ffmpeg(__dirname + "/" + fileName + ".mpeg")
       .output(__dirname + `/public/${fileName}.mp4`)
       .on("end", function () {
-        const response = sendToClientServer(fileName, req.token);
+        const response = sendToClientServer(fileName, token);
         res.send(response);
       })
       .on("error", function (err) {
