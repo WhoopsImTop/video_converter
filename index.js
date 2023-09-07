@@ -41,8 +41,7 @@ app.post("/convert", upload.single("file"), (req, res) => {
       })
       .run();
   } catch (e) {
-    //log error line
-    console.log(e);
+    res.send({ error: e, message: "Fehler beim Hochladen und umwandeln." });
   }
 });
 
