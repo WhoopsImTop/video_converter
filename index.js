@@ -22,6 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/convert", upload.single("file"), (req, res) => {
+  req.setTimeout(3600000);
   try {
     let file = req.file;
     //get token from request
