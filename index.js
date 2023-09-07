@@ -64,11 +64,10 @@ function sendToClientServer(fileName, file_id) {
     method: "POST",
     url: url,
     headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: "Bearer " + token,
+      "Content-Type": "multipart/form-data"
     },
     formData: {
-      file_id: fileName,
+      id: file_id,
       file: fs.createReadStream(__dirname + `/public/${fileName}.mp4`),
     },
   };
