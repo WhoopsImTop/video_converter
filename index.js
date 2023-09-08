@@ -56,7 +56,7 @@ function checkLastRequestTime() {
     const timeDifference = currentTime - lastRequestTime;
     const minutesSinceLastRequest = timeDifference / (1000 * 60);
 
-    if (minutesSinceLastRequest >= 1) {
+    if (minutesSinceLastRequest >= 20) {
       // Hier kannst du den PUT-Request ausführen, z.B. mit axios
       const config = {
         url: `https://scp-api.strato.de/v1/servers/${process.env.STRATO_SERVER_ID}/status/action`,
