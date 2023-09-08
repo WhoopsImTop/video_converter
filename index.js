@@ -101,7 +101,11 @@ app.post("/convert", upload.single("file"), (req, res) => {
     ffmpeg(__dirname + "/" + fileName + ".mpeg")
       .output(__dirname + `/public/${fileName}.mp4`)
       .on("end", function () {
-        sendToClientServer(fileName, file_id);
+        if (file_id) {
+          sendToClientServer(fileName, file_id);
+        } else {
+          res.send("Processing finished");
+        }
       })
       .on("error", function (err) {
         console.log("error: ", err);
