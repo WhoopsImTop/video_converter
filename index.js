@@ -104,7 +104,7 @@ app.post("/convert", upload.single("file"), (req, res) => {
         if (file_id) {
           sendToClientServer(fileName, file_id);
         } else {
-          res.send("Processing finished");
+          console.log("file_id not found");
         }
       })
       .on("error", function (err) {
