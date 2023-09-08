@@ -20,7 +20,7 @@ app.use(cors());
 // for parsing application/json
 app.use(bodyParser.json());
 
-let lastRequestTime = null;
+let lastRequestTime = new Date();
 
 // Middleware, um die Zeit der letzten Anfrage in eine Datei zu schreiben
 app.use((req, res, next) => {
@@ -62,7 +62,7 @@ function checkLastRequestTime() {
         url: `https://scp-api.strato.de/v1/servers/${process.env.STRATO_SERVER_ID}/status/action`,
         method: "put",
         headers: {
-          "X-TOKEN": process.env.STRATO_API_TOKEN,
+          "X-TOKEN": process.env.STRATO_API_KEY,
           "Content-Type": "application/json",
         },
         data: {
