@@ -35,14 +35,16 @@ app.post("/convert", upload.single("file"), (req, res) => {
     ffmpeg(__dirname + "/" + fileName + ".mpeg")
       .output(__dirname + `/public/${fileName}.mp4`)
       .on("end", function () {
-        const response = sendToClientServer(fileName, file_id);
-        res.send(response);
+        sendToClientServer(fileName, file_id);
       })
       .on("error", function (err) {
         console.log("error: ", err);
       })
       .on("progress", function (progress) {
         console.log("progress: ", progress);
+      })
+      .on("start", function () {
+        res.send("Processing started");
       })
       .run();
   } catch (e) {
@@ -65,7 +67,7 @@ function sendToClientServer(fileName, file_id) {
     method: "POST",
     url: url,
     headers: {
-      "Content-Type": "multipart/form-data"
+      "Content-Type": "multipart/form-data",
     },
     formData: {
       id: file_id,
