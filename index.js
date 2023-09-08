@@ -59,10 +59,10 @@ function checkLastRequestTime() {
     if (minutesSinceLastRequest >= 1) {
       // Hier kannst du den PUT-Request ausführen, z.B. mit axios
       const config = {
-        url: `https://scp-api.strato.de/v1/servers/${STRATO_SERVER_ID}/status`,
+        url: `https://scp-api.strato.de/v1/servers/${process.env.STRATO_SERVER_ID}/status`,
         method: "put",
         headers: {
-          "X-TOKEN": STRATO_API_TOKEN,
+          "X-TOKEN": process.env.STRATO_API_TOKEN,
           "Content-Type": "application/json",
         },
         data: {
