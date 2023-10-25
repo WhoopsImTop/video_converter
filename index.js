@@ -96,27 +96,52 @@ app.post("/convert", upload.single("file"), (req, res) => {
     const fileName = file.originalname.split(".")[0];
     const video = fs.readFileSync(file.path);
     //write file to temp folder
-    fs.writeFileSync(__dirname + "/" + fileName + ".mpeg", video);
-    //convert file to mp4
-    ffmpeg(__dirname + "/" + fileName + ".mpeg")
-      .output(__dirname + `/public/${fileName}.mp4`)
-      .on("end", function () {
-        if (file_id) {
-          sendToClientServer(fileName, file_id);
-        } else {
-          console.log("file_id not found");
-        }
-      })
-      .on("error", function (err) {
-        console.log("error: ", err);
-      })
-      .on("progress", function (progress) {
-        console.log("progress: ", progress);
-      })
-      .on("start", function () {
-        res.send("Processing started");
-      })
-      .run();
+    //check if video is mpeg or mpg
+    if (file.mimetype == "video/mpeg") {
+      fs.writeFileSync(__dirname + "/" + fileName + ".mpeg", video);
+      //convert file to mp4
+      ffmpeg(__dirname + "/" + fileName + ".mpeg")
+        .output(__dirname + `/public/${fileName}.mp4`)
+        .on("end", function () {
+          if (file_id) {
+            sendToClientServer(fileName, file_id);
+          } else {
+            console.log("file_id not found");
+          }
+        })
+        .on("error", function (err) {
+          console.log("error: ", err);
+        })
+        .on("progress", function (progress) {
+          console.log("progress: ", progress);
+        })
+        .on("start", function () {
+          res.send("Processing started");
+        })
+        .run();
+    } else if (file.mimetype == "video/mpg") {
+      fs.writeFileSync(__dirname + "/" + fileName + ".mpg", video);
+      //convert file to mp4
+      ffmpeg(__dirname + "/" + fileName + ".mpg")
+        .output(__dirname + `/public/${fileName}.mp4`)
+        .on("end", function () {
+          if (file_id) {
+            sendToClientServer(fileName, file_id);
+          } else {
+            console.log("file_id not found");
+          }
+        })
+        .on("error", function (err) {
+          console.log("error: ", err);
+        })
+        .on("progress", function (progress) {
+          console.log("progress: ", progress);
+        })
+        .on("start", function () {
+          res.send("Processing started");
+        })
+        .run();
+    }
   } catch (e) {
     res.send({ error: e, message: "Fehler beim Hochladen und umwandeln." });
   }
