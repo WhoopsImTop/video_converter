@@ -96,11 +96,14 @@ app.post("/convert", upload.single("file"), (req, res) => {
 
     // Überprüfen Sie, ob die Dateierweiterung mpeg oder mpg ist
     if (fileExtension === "mpeg" || fileExtension === "mpg") {
+      console.log("fileExtension: ", fileExtension);
       const video = fs.readFileSync(file.path);
+
+      fs.writeFileSync(__dirname + "/" + fileName + "." + fileExtension, video);
 
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(file.path)
+        .input(__dirname + "/" + fileName + "." + fileExtension)
         .output(__dirname + `/public/${fileName}.mp4`)
         .on("end", function () {
           if (file_id) {
@@ -120,7 +123,11 @@ app.post("/convert", upload.single("file"), (req, res) => {
         })
         .run();
     } else {
-      res.status(400).send("Unsupported file format. Only .mpeg and .mpg files are allowed.");
+      res
+        .status(400)
+        .send(
+          "Unsupported file format. Only .mpeg and .mpg files are allowed."
+        );
     }
   } catch (error) {
     console.error("An error occurred:", error);
