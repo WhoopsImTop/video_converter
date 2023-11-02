@@ -92,6 +92,7 @@ app.post("/convert", upload.single("file"), (req, res) => {
   try {
     console.log("req.body: ", req.body);
     let file = req.file;
+    const file_id = req.body.file_id;
     // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
