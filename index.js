@@ -7,6 +7,7 @@ const request = require("request");
 ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 const axios = require("axios");
 require("dotenv").config();
+const path = require("path");
 
 var bodyParser = require("body-parser");
 const multer = require("multer");
@@ -92,8 +93,9 @@ app.post("/convert", upload.single("file"), (req, res) => {
     console.log("req.body: ", req.body);
     let file = req.file;
     // Holen Sie sich den Dateinamen und die Erweiterung
-    const fileName = file.originalname.split(".")[0];
-    const fileExtension = file.originalname.split(".")[1].toLowerCase();
+    const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
+    const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
+
     console.log("fileName: ", fileName);
     console.log("fileExtension: ", fileExtension);
     // Überprüfen Sie, ob die Dateierweiterung mpeg oder mpg ist
