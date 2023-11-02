@@ -89,11 +89,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
+    console.log("req.body: ", req.body);
     let file = req.file;
     // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = file.originalname.split(".")[0];
     const fileExtension = file.originalname.split(".")[1].toLowerCase();
-
+    console.log("fileName: ", fileName);
+    console.log("fileExtension: ", fileExtension);
     // Überprüfen Sie, ob die Dateierweiterung mpeg oder mpg ist
     if (fileExtension === "mpeg" || fileExtension === "mpg") {
       console.log("fileExtension: ", fileExtension);
