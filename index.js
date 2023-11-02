@@ -118,7 +118,7 @@ app.post("/convert", upload.single("file"), (req, res) => {
         .output(__dirname + `/public/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
-            sendToClientServer(fileName, file_id);
+            sendToClientServer(fileNamewithoutExtension, file_id);
           } else {
             console.log("file_id not found");
           }
