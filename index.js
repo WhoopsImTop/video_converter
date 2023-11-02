@@ -90,17 +90,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
     let file = req.file;
-    //get token from request
-    const file_id = req.body.file_id;
-    console.log("file_id: ", file_id);
+    // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = file.originalname.split(".")[0];
-    const video = fs.readFileSync(file.path);
-    //write file to temp folder
-    //check if video is mpeg or mpg
-    if (file.mimetype == "video/mpeg") {
-      fs.writeFileSync(__dirname + "/" + fileName + ".mpeg", video);
-      //convert file to mp4
-      ffmpeg(__dirname + "/" + fileName + ".mpeg")
+    const fileExtension = file.originalname.split(".")[1].toLowerCase();
+
+    // Überprüfen Sie, ob die Dateierweiterung mpeg oder mpg ist
+    if (fileExtension === "mpeg" || fileExtension === "mpg") {
+      const video = fs.readFileSync(file.path);
+
+      // Konvertieren Sie die Datei in mp4
+      ffmpeg()
+        .input(file.path)
         .output(__dirname + `/public/${fileName}.mp4`)
         .on("end", function () {
           if (file_id) {
@@ -119,31 +119,12 @@ app.post("/convert", upload.single("file"), (req, res) => {
           res.send("Processing started");
         })
         .run();
-    } else if (file.mimetype == "video/mpg") {
-      fs.writeFileSync(__dirname + "/" + fileName + ".mpg", video);
-      //convert file to mp4
-      ffmpeg(__dirname + "/" + fileName + ".mpg")
-        .output(__dirname + `/public/${fileName}.mp4`)
-        .on("end", function () {
-          if (file_id) {
-            sendToClientServer(fileName, file_id);
-          } else {
-            console.log("file_id not found");
-          }
-        })
-        .on("error", function (err) {
-          console.log("error: ", err);
-        })
-        .on("progress", function (progress) {
-          console.log("progress: ", progress);
-        })
-        .on("start", function () {
-          res.send("Processing started");
-        })
-        .run();
+    } else {
+      res.status(400).send("Unsupported file format. Only .mpeg and .mpg files are allowed.");
     }
-  } catch (e) {
-    res.send({ error: e, message: "Fehler beim Hochladen und umwandeln." });
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).send("An error occurred during processing.");
   }
 });
 
