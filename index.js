@@ -95,9 +95,15 @@ app.post("/convert", upload.single("file"), (req, res) => {
     // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
+    //filename without extension
+    const fileNamewithoutExtension = path.basename(
+      file.originalname,
+      path.extname(file.originalname)
+    );
 
     console.log("fileName: ", fileName);
     console.log("fileExtension: ", fileExtension);
+    console.log("fileNamewithoutExtension: ", fileNamewithoutExtension);
     // Überprüfen Sie, ob die Dateierweiterung mpeg oder mpg ist
     if (fileExtension === "mpeg" || fileExtension === "mpg") {
       console.log("fileExtension: ", fileExtension);
