@@ -109,12 +109,12 @@ app.post("/convert", upload.single("file"), (req, res) => {
       console.log("fileExtension: ", fileExtension);
       const video = fs.readFileSync(file.path);
 
-      fs.writeFileSync(__dirname + "/" + fileName + "." + fileExtension, video);
+      fs.writeFileSync(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension, video);
 
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(__dirname + "/" + fileName + "." + fileExtension)
-        .output(__dirname + `/public/${fileName}.mp4`)
+        .input(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension)
+        .output(__dirname + `/public/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
             sendToClientServer(fileName, file_id);
