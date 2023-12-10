@@ -149,54 +149,42 @@ app.post("/convert", upload.single("file"), (req, res) => {
   }
 });
 
-app.post("/convert-single", upload.single("file"), (req, res) => {
+app.post("/convert-single", upload.single("file"), async (req, res) => {
   try {
-    let file = req.file;
-
-    //entferne leerzeichen aus dem dateinamen und ersetze sie mit _
-    const fileName = file.originalname.replace(/\s/g, "_");
-    const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
-    //filename without extension
-    const fileNamewithoutExtension = path.basename(
-      fileName,
+    const file = req.file;
+    const fileNameWithoutExtension = path.basename(
+      file.originalname,
       path.extname(file.originalname)
     );
+    const inputFile = path.join(__dirname, "uploads", file.filename);
+    const outputFile = path.join(
+      __dirname,
+      "output",
+      `${fileNameWithoutExtension}.mp4`
+    );
 
-    console.log("fileName: ", fileName);
-    console.log("fileExtension: ", fileExtension);
-    console.log("fileNamewithoutExtension: ", fileNamewithoutExtension);
-    // Überprüfen Sie, ob die Dateierweiterung mpeg oder mpg ist
-    if (fileExtension === "mpeg" || fileExtension === "mpg") {
-      const video = fs.readFileSync(file.path);
+    if (file.mimetype === "video/mpeg" || file.mimetype === "video/mpg") {
+      // Convert the file to MP4 using FFmpeg
+      await new Promise((resolve, reject) => {
+        ffmpeg()
+          .input(inputFile)
+          .output(outputFile)
+          .on("end", resolve)
+          .on("error", reject)
+          .run();
+      });
 
-      fs.writeFileSync(
-        __dirname + "/" + fileNamewithoutExtension + "." + fileExtension,
-        video
-      );
-
-      // Konvertieren Sie die Datei in mp4
-      ffmpeg()
-        .input(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension)
-        .output(__dirname + `/output/${fileNamewithoutExtension}.mp4`)
-        .on("end", function () {
-          //return file, filename
-          res.json({
-            file: fs.readFileSync(
-              __dirname + `/output/${fileNamewithoutExtension}.mp4`
-            ),
-            fileName: `${fileNamewithoutExtension}.mp4`,
-          });
-        })
-        .on("error", function (err) {
+      // Send the converted file as an attachment
+      res.download(outputFile, `${fileNameWithoutExtension}.mp4`, (err) => {
+        if (err) {
+          console.error("Error during download:", err);
           res.status(500).send("An error occurred during processing.");
-        })
-        .on("progress", function (progress) {
-          console.log("progress: ", progress);
-        })
-        .on("start", function () {
-          console.log("Processing started");
-        })
-        .run();
+        }
+
+        // Clean up the temporary files after the response has been sent
+        fs.unlinkSync(inputFile);
+        fs.unlinkSync(outputFile);
+      });
     } else {
       res
         .status(400)
