@@ -11,7 +11,10 @@ const path = require("path");
 
 var bodyParser = require("body-parser");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+const upload = multer(
+  { dest: "uploads/" },
+  { limits: { fileSize: 5 * 1024 * 1024 } }
+);
 
 const app = express();
 const port = 3000;
@@ -20,8 +23,6 @@ app.use(cors());
 
 // for parsing application/json
 app.use(bodyParser.json());
-//limit file size to 5gb
-app.use(bodyParser.json({ limit: "5000mb" }));
 
 let lastRequestTime = new Date();
 
@@ -185,9 +186,7 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
         .on("end", function () {
           if (file_id) {
             //return file as response
-            res.sendFile(
-              __dirname + `/public/${fileNamewithoutExtension}.mp4`
-            );
+            res.sendFile(__dirname + `/public/${fileNamewithoutExtension}.mp4`);
           } else {
             console.log("file_id not found");
           }
