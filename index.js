@@ -180,7 +180,7 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
         .output(__dirname + `/output/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           //return file, filename
-          res.send({
+          res.json({
             file: fs.readFileSync(
               __dirname + `/output/${fileNamewithoutExtension}.mp4`
             ),
