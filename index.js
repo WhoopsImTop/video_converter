@@ -20,8 +20,8 @@ const port = 3000;
 
 app.use(cors());
 
-app.use(express.json({ limit: "50gb"}));
-app.use(express.urlencoded({ extended: true }, { limit: "50gb"}));
+app.use(express.json({ limit: "50gb" }));
+app.use(express.urlencoded({ extended: true }, { limit: "50gb" }));
 
 let lastRequestTime = new Date();
 
@@ -152,8 +152,8 @@ app.post("/convert", upload.single("file"), (req, res) => {
 app.post("/convert-single", upload.single("file"), (req, res) => {
   try {
     let file = req.file;
-    
-    //entferne leerzeichen aus dem dateinamen und ersetze sie mit _ 
+
+    //entferne leerzeichen aus dem dateinamen und ersetze sie mit _
     const fileName = file.originalname.replace(/\s/g, "_");
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
     //filename without extension
@@ -179,14 +179,8 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
         .input(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension)
         .output(__dirname + `/output/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
-          if (file_id) {
-            //return file to response
-            res.sendFile(
-              __dirname + `/output/${fileNamewithoutExtension}.mp4`
-            );
-          } else {
-            console.log("file_id not found");
-          }
+          //return file to response
+          res.sendFile(__dirname + `/output/${fileNamewithoutExtension}.mp4`);
         })
         .on("error", function (err) {
           console.log("error: ", err);
