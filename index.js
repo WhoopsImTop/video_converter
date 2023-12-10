@@ -20,8 +20,8 @@ const port = 3000;
 
 app.use(cors());
 
-app.use(express.json({ limit: "50gb" }));
-app.use(express.urlencoded({ extended: true, limit: "50gb" }));
+app.use(express.json({ limit: "5000mb" }));
+app.use(express.urlencoded({ extended: true, limit: "5000mb", parameterLimit: 5000000000 }));
 
 let lastRequestTime = new Date();
 
