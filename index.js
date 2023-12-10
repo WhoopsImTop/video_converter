@@ -23,6 +23,8 @@ app.use(cors());
 app.use(express.json({ limit: "50gb" }));
 app.use(express.urlencoded({ extended: true }, { limit: "50gb" }));
 
+app.use('/output', express.static(path.join(__dirname, 'output')));
+
 let lastRequestTime = new Date();
 
 // Middleware, um die Zeit der letzten Anfrage in eine Datei zu schreiben
