@@ -21,7 +21,13 @@ const port = 3000;
 app.use(cors());
 
 app.use(express.json({ limit: "5000mb" }));
-app.use(express.urlencoded({ extended: true, limit: "5000mb", parameterLimit: 5000000000 }));
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: "5000mb",
+    parameterLimit: 5000000000,
+  })
+);
 
 let lastRequestTime = new Date();
 
@@ -175,9 +181,12 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
         video
       );
 
+      const outputFolder = path.join(__dirname, "/public/");
+      fs.mkdirSync(outputFolder, { recursive: true });
+
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension)
+        .input(`"${__dirname}/${fileNamewithoutExtension}.${fileExtension}"`)
         .output(__dirname + `/public/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
