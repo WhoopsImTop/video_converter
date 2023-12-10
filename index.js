@@ -12,7 +12,7 @@ const path = require("path");
 const multer = require("multer");
 const upload = multer(
   { dest: "uploads/" },
-  { limits: { fileSize: 5 * 1024 * 1024 } }
+  { limits: { fileSize: 5000000000 } }
 );
 
 const app = express();
