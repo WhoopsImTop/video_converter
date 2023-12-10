@@ -96,8 +96,9 @@ setInterval(checkLastRequestTime, 60 * 1000); // 60 * 1000 Millisekunden entspre
 
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
-    console.log("req.body: ", req.body);
     let file = req.file;
+    //change file name
+    file.originalname = file.originalname.replace(/[^\w\s.-]/gi, "");
     const file_id = req.body.file_id;
     // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
