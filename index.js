@@ -138,7 +138,8 @@ app.post("/convert-single", upload.single("file"), async (req, res) => {
           .run();
       });
 
-      const downloadUrl = `/download/${fileNameWithoutExtension}.mp4`;
+      //create public url for the file in output folder
+      const publicUrl = `https://api.eliasenglen.de/output/${fileNameWithoutExtension}.mp4`;
 
       // Return the download URL in the JSON response
       res.json({fileUrl: downloadUrl });
