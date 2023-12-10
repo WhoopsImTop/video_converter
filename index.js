@@ -147,6 +147,78 @@ app.post("/convert", upload.single("file"), (req, res) => {
   }
 });
 
+app.post("/convert-single", upload.single("file"), (req, res) => {
+  try {
+    let file = req.file;
+    //get token from request
+    const file_id = req.body.file_id;
+    console.log("file_id: ", file_id);
+    const fileName = path.basename(file.originalname).split(".")[0];
+    const video = fs.readFileSync(file.path);
+    //write file to temp folder
+    //check if video is mpeg or mpg
+    if (file.mimetype == "video/mpeg") {
+      fs.writeFileSync(__dirname + "/" + fileName + ".mpeg", video);
+      //convert file to mp4
+      ffmpeg(__dirname + "/" + fileName + ".mpeg")
+        .output(__dirname + `/public/${fileName}.mp4`)
+        .on("end", function () {
+          if (file_id) {
+            //return file as response
+            const file = fs.readFileSync(__dirname + `/public/${fileName}.mp4`);
+            res.writeHead(200, {
+              "Content-Type": `video/${getFileType(fileName)}`,
+              "Content-Length": file.length,
+            });
+            res.end(file);
+          } else {
+            console.log("file_id not found");
+          }
+        })
+        .on("error", function (err) {
+          console.log("error: ", err);
+        })
+        .on("progress", function (progress) {
+          console.log("progress: ", progress);
+        })
+        .on("start", function () {
+          res.send("Processing started");
+        })
+        .run();
+    } else if (file.mimetype == "video/mpg") {
+      fs.writeFileSync(__dirname + "/" + fileName + ".mpg", video);
+      //convert file to mp4
+      ffmpeg(__dirname + "/" + fileName + ".mpg")
+        .output(__dirname + `/public/${fileName}.mp4`)
+        .on("end", function () {
+          if (file_id) {
+            //return file as response
+            const file = fs.readFileSync(__dirname + `/public/${fileName}.mp4`);
+            res.writeHead(200, {
+              "Content-Type": `video/${getFileType(fileName)}`,
+              "Content-Length": file.length,
+            });
+            res.end(file);
+          } else {
+            console.log("file_id not found");
+          }
+        })
+        .on("error", function (err) {
+          console.log("error: ", err);
+        })
+        .on("progress", function (progress) {
+          console.log("progress: ", progress);
+        })
+        .on("start", function () {
+          res.send("Processing started");
+        })
+        .run();
+    }
+  } catch (e) {
+    res.send({ error: e, message: "Fehler beim Hochladen und umwandeln." });
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
