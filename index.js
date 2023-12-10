@@ -10,18 +10,18 @@ require("dotenv").config();
 const path = require("path");
 
 const multer = require("multer");
-const upload = multer(
-  { dest: "uploads/" },
-  { limits: { fileSize: 5000000000 } }
-);
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 5000000000 }, // 5 GB
+});
 
 const app = express();
 const port = 3000;
 
 app.use(cors());
 
-app.use(express.json({ limit: "50gb"}));
-app.use(express.urlencoded({ extended: true }, { limit: "50gb"}));
+app.use(express.json({ limit: "50gb" }));
+app.use(express.urlencoded({ extended: true, limit: "50gb" }));
 
 let lastRequestTime = new Date();
 
@@ -153,7 +153,6 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
   try {
     console.log("req.body: ", req.body);
     let file = req.file;
-    const file_id = req.body.file_id;
     // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
