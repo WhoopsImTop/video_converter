@@ -52,42 +52,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Funktion zur Überprüfung der letzten Anfragezeit und Ausführung des PUT-Requests
-function checkLastRequestTime() {
-  const currentTime = new Date();
-  if (lastRequestTime) {
-    const timeDifference = currentTime - lastRequestTime;
-    const minutesSinceLastRequest = timeDifference / (1000 * 60);
-
-    if (minutesSinceLastRequest >= 20) {
-      // Hier kannst du den PUT-Request ausführen, z.B. mit axios
-      const config = {
-        url: `https://scp-api.strato.de/v1/servers/${process.env.STRATO_SERVER_ID}/status/action`,
-        method: "put",
-        headers: {
-          "X-TOKEN": process.env.STRATO_API_KEY,
-          "Content-Type": "application/json",
-        },
-        data: {
-          action: "POWER_OFF",
-          method: "HARDWARE",
-        },
-      };
-      axios
-        .request(config)
-        .then((response) => {
-          console.log("PUT-Request erfolgreich ausgeführt:", response.data);
-        })
-        .catch((error) => {
-          console.error("Fehler beim Ausführen des PUT-Requests:", error);
-        });
-    }
-  }
-}
-
-// Überprüfe die letzte Anfragezeit alle Minute
-setInterval(checkLastRequestTime, 60 * 1000); // 60 * 1000 Millisekunden entsprechen einer Minute
-
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
     console.log("req.body: ", req.body);
