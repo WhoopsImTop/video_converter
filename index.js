@@ -123,7 +123,7 @@ app.post("/convert", upload.single("file"), (req, res) => {
 
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension)
+        .input(`"${__dirname}/${fileNamewithoutExtension}.${fileExtension}"`)
         .output(__dirname + `/public/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
@@ -163,10 +163,9 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
     const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
     //filename without extension
-    const fileNamewithoutExtension = path.basename(
-      file.originalname,
-      path.extname(file.originalname)
-    ).replace(/[^\w\s.-]/gi, '');
+    const fileNamewithoutExtension = path
+      .basename(file.originalname, path.extname(file.originalname))
+      .replace(/[^\w\s.-]/gi, "");
 
     console.log("fileName: ", fileName);
     console.log("fileExtension: ", fileExtension);
