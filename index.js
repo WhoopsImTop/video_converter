@@ -10,24 +10,18 @@ require("dotenv").config();
 const path = require("path");
 
 const multer = require("multer");
-const upload = multer({
-  dest: "uploads/",
-  limits: { fileSize: 5000000000 }, // 5 GB
-});
+const upload = multer(
+  { dest: "uploads/" },
+  { limits: { fileSize: 5000000000 } }
+);
 
 const app = express();
 const port = 3000;
 
 app.use(cors());
 
-app.use(express.json({ limit: "5000mb" }));
-app.use(
-  express.urlencoded({
-    extended: true,
-    limit: "5000mb",
-    parameterLimit: 5000000000,
-  })
-);
+app.use(express.json({ limit: "50gb"}));
+app.use(express.urlencoded({ extended: true }, { limit: "50gb"}));
 
 let lastRequestTime = new Date();
 
@@ -96,9 +90,8 @@ setInterval(checkLastRequestTime, 60 * 1000); // 60 * 1000 Millisekunden entspre
 
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
+    console.log("req.body: ", req.body);
     let file = req.file;
-    //change file name
-    file.originalname = file.originalname.replace(/[^\w\s.-]/gi, "");
     const file_id = req.body.file_id;
     // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
@@ -124,7 +117,7 @@ app.post("/convert", upload.single("file"), (req, res) => {
 
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(`"${__dirname}/${fileNamewithoutExtension}.${fileExtension}"`)
+        .input(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension)
         .output(__dirname + `/public/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
@@ -159,37 +152,37 @@ app.post("/convert", upload.single("file"), (req, res) => {
 app.post("/convert-single", upload.single("file"), (req, res) => {
   try {
     let file = req.file;
-    file.originalname = file.originalname.replace(/[^\w\s.-]/gi, "");
     // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
     //filename without extension
-    const fileNamewithoutExtension = path
-      .basename(file.originalname, path.extname(file.originalname))
-      .replace(/[^\w\s.-]/gi, "");
+    const fileNamewithoutExtension = path.basename(
+      file.originalname,
+      path.extname(file.originalname)
+    );
 
     console.log("fileName: ", fileName);
     console.log("fileExtension: ", fileExtension);
     console.log("fileNamewithoutExtension: ", fileNamewithoutExtension);
     // Überprüfen Sie, ob die Dateierweiterung mpeg oder mpg ist
     if (fileExtension === "mpeg" || fileExtension === "mpg") {
-      //write file to public folder
-      fs.writeFileSync(
-        __dirname + "/public/" + fileNamewithoutExtension + "." + fileExtension,
-        file.buffer
-      );
+      const video = fs.readFileSync(file.path);
 
-      const outputFolder = path.join(__dirname, "/public/");
-      fs.mkdirSync(outputFolder, { recursive: true });
+      fs.writeFileSync(
+        __dirname + "/" + fileNamewithoutExtension + "." + fileExtension,
+        video
+      );
 
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(`"${__dirname}/public/${fileNamewithoutExtension}.${fileExtension}"`)
-        .output(`${outputFolder + fileNamewithoutExtension}.mp4`)
+        .input(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension)
+        .output(__dirname + `/output/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
-            //return file in response
-            res.sendFile(`${outputFolder + fileNamewithoutExtension}.mp4`);
+            //return file to response
+            res.sendFile(
+              __dirname + `/output/${fileNamewithoutExtension}.mp4`
+            );
           } else {
             console.log("file_id not found");
           }
