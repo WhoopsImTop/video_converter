@@ -20,6 +20,8 @@ app.use(cors());
 
 // for parsing application/json
 app.use(bodyParser.json());
+//limit file size to 5gb
+app.use(bodyParser.json({ limit: "5000mb" }));
 
 let lastRequestTime = new Date();
 
