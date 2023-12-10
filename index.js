@@ -190,7 +190,7 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
 
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(`"${__dirname}/${fileNamewithoutExtension}.${fileExtension}"`)
+        .input(`"${__dirname}/uploads/${fileNamewithoutExtension}.${fileExtension}"`)
         .output(__dirname + `/uploads/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
