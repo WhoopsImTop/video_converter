@@ -158,7 +158,7 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
     //filename without extension
     const fileNamewithoutExtension = path.basename(
-      file.originalname,
+      fileName,
       path.extname(file.originalname)
     );
 
