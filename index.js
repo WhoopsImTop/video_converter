@@ -183,13 +183,13 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
           res.sendFile(__dirname + `/output/${fileNamewithoutExtension}.mp4`);
         })
         .on("error", function (err) {
-          console.log("error: ", err);
+          res.status(500).send("An error occurred during processing.");
         })
         .on("progress", function (progress) {
           console.log("progress: ", progress);
         })
         .on("start", function () {
-          res.send("Processing started");
+          console.log("Processing started");
         })
         .run();
     } else {
