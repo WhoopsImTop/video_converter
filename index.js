@@ -9,7 +9,6 @@ const axios = require("axios");
 require("dotenv").config();
 const path = require("path");
 
-var bodyParser = require("body-parser");
 const multer = require("multer");
 const upload = multer(
   { dest: "uploads/" },
@@ -21,8 +20,8 @@ const port = 3000;
 
 app.use(cors());
 
-// for parsing application/json
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 let lastRequestTime = new Date();
 
@@ -88,8 +87,6 @@ function checkLastRequestTime() {
 
 // Überprüfe die letzte Anfragezeit alle Minute
 setInterval(checkLastRequestTime, 60 * 1000); // 60 * 1000 Millisekunden entsprechen einer Minute
-
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
