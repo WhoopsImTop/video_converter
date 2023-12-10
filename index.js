@@ -179,8 +179,13 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
         .input(__dirname + "/" + fileNamewithoutExtension + "." + fileExtension)
         .output(__dirname + `/output/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
-          //return file to response
-          res.sendFile(__dirname + `/output/${fileNamewithoutExtension}.mp4`);
+          //return file, filename
+          res.send({
+            file: fs.readFileSync(
+              __dirname + `/output/${fileNamewithoutExtension}.mp4`
+            ),
+            fileName: `${fileNamewithoutExtension}.mp4`,
+          });
         })
         .on("error", function (err) {
           res.status(500).send("An error occurred during processing.");
