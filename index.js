@@ -159,9 +159,9 @@ app.post("/convert", upload.single("file"), (req, res) => {
 app.post("/convert-single", upload.single("file"), (req, res) => {
   try {
     let file = req.file;
-    file.originalname = file.originalname.replace(/[^\w\s.-]/gi, "");
+    //change file name
     // Holen Sie sich den Dateinamen und die Erweiterung
-    const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
+    const fileName = path.basename(req.filename); // Dateiname mit Erweiterung
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
     //filename without extension
     const fileNamewithoutExtension = path
