@@ -166,7 +166,7 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
     const fileNamewithoutExtension = path.basename(
       file.originalname,
       path.extname(file.originalname)
-    );
+    ).replace(/[^\w\s.-]/gi, '');
 
     console.log("fileName: ", fileName);
     console.log("fileExtension: ", fileExtension);
@@ -184,16 +184,14 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
       const outputFolder = path.join(__dirname, "/public/");
       fs.mkdirSync(outputFolder, { recursive: true });
 
-      const cleanFileName = fileNamewithoutExtension.replace(/[^\w\s.-]/gi, '');
-
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(`"${__dirname}/${cleanFileName}.${fileExtension}"`)
-        .output(__dirname + `/public/${cleanFileName}.mp4`)
+        .input(`"${__dirname}/${fileNamewithoutExtension}.${fileExtension}"`)
+        .output(__dirname + `/public/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
             //return file as response
-            res.sendFile(__dirname + `/public/${cleanFileName}.mp4`);
+            res.sendFile(__dirname + `/public/${fileNamewithoutExtension}.mp4`);
           } else {
             console.log("file_id not found");
           }
