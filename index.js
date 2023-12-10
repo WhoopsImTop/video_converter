@@ -159,9 +159,9 @@ app.post("/convert", upload.single("file"), (req, res) => {
 app.post("/convert-single", upload.single("file"), (req, res) => {
   try {
     let file = req.file;
-    //change file name
+    file.originalname = file.originalname.replace(/[^\w\s.-]/gi, "");
     // Holen Sie sich den Dateinamen und die Erweiterung
-    const fileName = path.basename(req.filename); // Dateiname mit Erweiterung
+    const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
     //filename without extension
     const fileNamewithoutExtension = path
@@ -173,16 +173,10 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
     console.log("fileNamewithoutExtension: ", fileNamewithoutExtension);
     // Überprüfen Sie, ob die Dateierweiterung mpeg oder mpg ist
     if (fileExtension === "mpeg" || fileExtension === "mpg") {
-      console.log("fileExtension: ", fileExtension);
-      const video = fs.readFileSync(file.path);
-
+      //write file to public folder
       fs.writeFileSync(
-        __dirname +
-          "/uploads/" +
-          fileNamewithoutExtension +
-          "." +
-          fileExtension,
-        video
+        __dirname + "/public/" + fileNamewithoutExtension + "." + fileExtension,
+        file.buffer
       );
 
       const outputFolder = path.join(__dirname, "/public/");
@@ -190,11 +184,12 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
 
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
-        .input(`"${__dirname}/uploads/${fileNamewithoutExtension}.${fileExtension}"`)
-        .output(__dirname + `/uploads/${fileNamewithoutExtension}.mp4`)
+        .input(`"${__dirname}/public/${fileNamewithoutExtension}.${fileExtension}"`)
+        .output(`${outputFolder + fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
-            sendToClientServer(fileNamewithoutExtension, file_id);
+            //return file in response
+            res.sendFile(`${outputFolder + fileNamewithoutExtension}.mp4`);
           } else {
             console.log("file_id not found");
           }
