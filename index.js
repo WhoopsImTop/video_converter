@@ -174,17 +174,10 @@ app.post("/convert-single", upload.single("file"), async (req, res) => {
           .run();
       });
 
-      // Send the converted file as an attachment
-      res.download(outputFile, `${fileNameWithoutExtension}.mp4`, (err) => {
-        if (err) {
-          console.error("Error during download:", err);
-          res.status(500).send("An error occurred during processing.");
-        }
+      const downloadUrl = `/download/${fileNameWithoutExtension}.mp4`;
 
-        // Clean up the temporary files after the response has been sent
-        fs.unlinkSync(inputFile);
-        fs.unlinkSync(outputFile);
-      });
+      // Return the download URL in the JSON response
+      res.json({fileUrl: downloadUrl });
     } else {
       res
         .status(400)
