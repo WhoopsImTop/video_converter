@@ -177,7 +177,11 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
       const video = fs.readFileSync(file.path);
 
       fs.writeFileSync(
-        __dirname + "/" + fileNamewithoutExtension + "." + fileExtension,
+        __dirname +
+          "/uploads/" +
+          fileNamewithoutExtension +
+          "." +
+          fileExtension,
         video
       );
 
@@ -187,7 +191,7 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
       // Konvertieren Sie die Datei in mp4
       ffmpeg()
         .input(`"${__dirname}/${fileNamewithoutExtension}.${fileExtension}"`)
-        .output(__dirname + `/public/${fileNamewithoutExtension}.mp4`)
+        .output(__dirname + `/uploads/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
             sendToClientServer(fileNamewithoutExtension, file_id);
