@@ -158,8 +158,8 @@ app.post("/convert", upload.single("file"), (req, res) => {
 
 app.post("/convert-single", upload.single("file"), (req, res) => {
   try {
-    console.log("req.body: ", req.body);
     let file = req.file;
+    file.originalname = file.originalname.replace(/[^\w\s.-]/gi, "");
     // Holen Sie sich den Dateinamen und die Erweiterung
     const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
     const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
@@ -190,8 +190,7 @@ app.post("/convert-single", upload.single("file"), (req, res) => {
         .output(__dirname + `/public/${fileNamewithoutExtension}.mp4`)
         .on("end", function () {
           if (file_id) {
-            //return file as response
-            res.sendFile(__dirname + `/public/${fileNamewithoutExtension}.mp4`);
+            sendToClientServer(fileNamewithoutExtension, file_id);
           } else {
             console.log("file_id not found");
           }
