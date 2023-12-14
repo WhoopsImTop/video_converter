@@ -161,15 +161,15 @@ app.post("/convert-file", async (req, res) => {
         path.extname(fileExtension)
       );
 
-      //get file from public folder
-      const file = fs.readFileSync(
-        path.join(__dirname, "public", `${fileName}`)
+      const inputFile = path.join(__dirname, "public", fileName);
+      const outputFile = path.join(
+        __dirname,
+        "output",
+        `${fileNamewithoutExtension}.mp4`
       );
-
-      const inputFile = path.join(__dirname, "uploads", fileName);
-      const outputFile = path.join(__dirname, "output", `${fileNamewithoutExtension}.mp4`);
-
-      if (file.mimetype === "video/mpeg" || file.mimetype === "video/mpg") {
+      console.log("inputFile: ", inputFile);
+      console.log("outputFile: ", outputFile);
+      if (fileExtension === "mpeg" || fileExtension === "mpg") {
         // Convert the file to MP4 using FFmpeg
         await new Promise((resolve, reject) => {
           ffmpeg()
