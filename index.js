@@ -23,7 +23,7 @@ app.use(cors());
 app.use(express.json({ limit: "50gb" }));
 app.use(express.urlencoded({ extended: true }, { limit: "50gb" }));
 
-app.use('/output', express.static(path.join(__dirname, 'output')));
+app.use("/output", express.static(path.join(__dirname, "output")));
 
 let lastRequestTime = new Date();
 
@@ -115,42 +115,74 @@ app.post("/convert", upload.single("file"), (req, res) => {
   }
 });
 
-app.post("/convert-single", upload.single("file"), async (req, res) => {
+app.post("/upload-file", upload.single("file"), async (req, res) => {
   try {
     const file = req.file;
-    const fileNameWithoutExtension = path.basename(
+    //generate file id
+    const file_id = Math.floor(Math.random() * 1000000000);
+    // Holen Sie sich den Dateinamen und die Erweiterung
+    const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
+    const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
+    //filename without extension
+    const fileNamewithoutExtension = path.basename(
       file.originalname,
       path.extname(file.originalname)
     );
-    const inputFile = path.join(__dirname, "uploads", file.filename);
-    const outputFile = path.join(
-      __dirname,
-      "output",
-      `${fileNameWithoutExtension}.mp4`
-    );
+    //save id, filename and extension in a database file
+    const data = {
+      id: file_id,
+      filename: fileName,
+      extension: fileExtension,
+    };
+    const db = fs.readFileSync("database.json");
+    const dbData = JSON.parse(db);
+    dbData.push(data);
+    fs.writeFileSync("database.json", JSON.stringify(dbData));
+    res.json({ file_id: file_id });
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).send("An error occurred during processing.");
+  }
+});
 
-    if (file.mimetype === "video/mpeg" || file.mimetype === "video/mpg") {
-      // Convert the file to MP4 using FFmpeg
-      await new Promise((resolve, reject) => {
-        ffmpeg()
-          .input(inputFile)
-          .output(outputFile)
-          .on("end", resolve)
-          .on("error", reject)
-          .run();
-      });
+app.post("/convert-file", async (req, res) => {
+  try {
+    const file_id = req.body.file_id;
+    const db = fs.readFileSync("database.json");
+    const dbData = JSON.parse(db);
+    const fileData = dbData.find((data) => data.id == file_id);
+    if (fileData) {
+      const fileName = fileData.filename;
+      const fileExtension = fileData.extension;
 
-      //create public url for the file in output folder
-      const publicUrl = `https://api.eliasenglen.de/output/${fileNameWithoutExtension}.mp4`;
+      const inputFile = path.join(__dirname, "uploads", fileName);
+      const outputFile = path.join(__dirname, "output", `${fileName}.mp4`);
 
-      // Return the download URL in the JSON response
-      res.json({fileUrl: publicUrl });
+      if (file.mimetype === "video/mpeg" || file.mimetype === "video/mpg") {
+        // Convert the file to MP4 using FFmpeg
+        await new Promise((resolve, reject) => {
+          ffmpeg()
+            .input(inputFile)
+            .output(outputFile)
+            .on("end", resolve)
+            .on("error", reject)
+            .run();
+        });
+
+        //create public url for the file in output folder
+        const publicUrl = `https://api.eliasenglen.de/output/${fileName}.mp4`;
+
+        // Return the download URL in the JSON response
+        res.json({ fileUrl: publicUrl });
+      } else {
+        res
+          .status(400)
+          .send(
+            "Unsupported file format. Only .mpeg and .mpg files are allowed."
+          );
+      }
     } else {
-      res
-        .status(400)
-        .send(
-          "Unsupported file format. Only .mpeg and .mpg files are allowed."
-        );
+      res.status(400).send("File not found");
     }
   } catch (error) {
     console.error("An error occurred:", error);
