@@ -151,6 +151,7 @@ app.post("/convert-file", async (req, res) => {
     const db = fs.readFileSync(path.join(__dirname, "database.json"));
     const dbData = JSON.parse(db);
     const fileData = dbData.find((data) => data.id == file_id);
+    console.log("fileData: ", fileData);
     if (fileData) {
       const fileName = fileData.filename;
       const fileExtension = fileData.extension;
