@@ -25,34 +25,27 @@ app.use(express.urlencoded({ extended: true }, { limit: "50gb" }));
 
 app.use("/output", express.static(path.join(__dirname, "output")));
 
-let lastRequestTime = new Date();
-
-// Middleware, um die Zeit der letzten Anfrage in eine Datei zu schreiben
-app.use((req, res, next) => {
-  const currentTime = new Date();
-  const formattedTime = currentTime.toISOString();
-
-  // Schreibe die Zeit der letzten Anfrage in die Datei (z.B. lastRequestTime.txt)
-  fs.writeFile("lastRequestTime.txt", formattedTime, (err) => {
-    if (err) {
-      console.error(
-        "Fehler beim Schreiben der letzten Anfragezeit in die Datei:",
-        err
-      );
-    } else {
-      console.log(
-        "Zeit der letzten Anfrage in die Datei geschrieben:",
-        formattedTime
-      );
-    }
+//setup a cronjob that clears the output, uploads and public folder every day at 00:00 and resets the database.json file
+const cron = require("node-cron");
+cron.schedule("0 0 * * *", () => {
+  console.log("running a task every day at 00:00");
+  //delete all files in output folder
+  fs.readdirSync(__dirname + "/output").forEach((file) => {
+    fs.unlinkSync(__dirname + "/output/" + file);
   });
+  //delete all files in uploads folder
+  fs.readdirSync(__dirname + "/uploads").forEach((file) => {
+    fs.unlinkSync(__dirname + "/uploads/" + file);
+  });
+  //delete all files in public folder
+  fs.readdirSync(__dirname + "/public").forEach((file) => {
+    fs.unlinkSync(__dirname + "/public/" + file);
+  });
+  //reset database.json file
+  fs.writeFileSync("database.json", JSON.stringify([]));
+}
+);
 
-  // Aktualisiere lastRequestTime
-  lastRequestTime = currentTime;
-
-  // Rufe die nächste Middleware oder Route auf
-  next();
-});
 
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
