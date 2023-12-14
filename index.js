@@ -161,7 +161,7 @@ app.post("/convert-file", async (req, res) => {
         path.extname(fileExtension)
       );
 
-      const inputFile = path.join(__dirname, "public", fileName);
+      const inputFile = path.join(__dirname, "uploads", fileName);
       const outputFile = path.join(
         __dirname,
         "output",
