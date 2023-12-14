@@ -120,19 +120,15 @@ app.post("/upload-file", upload.single("file"), async (req, res) => {
     const file = req.file;
     //generate file id
     const file_id = Math.floor(Math.random() * 1000000000);
-    // Holen Sie sich den Dateinamen und die Erweiterung
-    const fileName = path.basename(file.originalname); // Dateiname mit Erweiterung
-    const fileExtension = path.extname(fileName).toLowerCase().substring(1); // Dateierweiterung ohne Punkt
-    //filename without extension
-    const fileNamewithoutExtension = path.basename(
-      file.originalname,
-      path.extname(file.originalname)
-    );
+    //get filepath of uploaded file
+    const filePath = file.path;
+
     //save id, filename and extension in a database file
     const data = {
       id: file_id,
-      filename: fileName,
-      extension: fileExtension,
+      filename: file.originalname,
+      extension: file.originalname.split(".").pop(),
+      filepath: filePath,
     };
     const db = fs.readFileSync(path.join(__dirname, "database.json"));
     const dbData = JSON.parse(db);
@@ -153,21 +149,13 @@ app.post("/convert-file", async (req, res) => {
     const fileData = dbData.find((data) => data.id == file_id);
     console.log("fileData: ", fileData);
     if (fileData) {
-      const fileName = fileData.filename;
+      const inputFile = fileData.filepath;
+      const fileName = fileData.filename.split(".").shift();
       const fileExtension = fileData.extension;
-
-      const fileNamewithoutExtension = path.basename(
-        fileName,
-        path.extname(fileExtension)
-      );
-
-      const inputFile = path.join(__dirname, "uploads", fileName);
-      const outputFile = path.join(
-        __dirname,
-        "output",
-        `${fileNamewithoutExtension}.mp4`
-      );
+      const outputFile = __dirname + `/output/${fileName}.mp4`;
       console.log("inputFile: ", inputFile);
+      console.log("fileName: ", fileName);
+      console.log("fileExtension: ", fileExtension);
       console.log("outputFile: ", outputFile);
       if (fileExtension === "mpeg" || fileExtension === "mpg") {
         // Convert the file to MP4 using FFmpeg
