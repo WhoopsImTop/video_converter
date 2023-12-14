@@ -134,7 +134,7 @@ app.post("/upload-file", upload.single("file"), async (req, res) => {
       filename: fileName,
       extension: fileExtension,
     };
-    const db = fs.readFileSync("database.json");
+    const db = fs.readFileSync(path.join(__dirname, "database.json"));
     const dbData = JSON.parse(db);
     dbData.push(data);
     fs.writeFileSync("database.json", JSON.stringify(dbData));
@@ -148,7 +148,7 @@ app.post("/upload-file", upload.single("file"), async (req, res) => {
 app.post("/convert-file", async (req, res) => {
   try {
     const file_id = req.body.file_id;
-    const db = fs.readFileSync("database.json");
+    const db = fs.readFileSync(path.join(__dirname, "database.json"));
     const dbData = JSON.parse(db);
     const fileData = dbData.find((data) => data.id == file_id);
     if (fileData) {
