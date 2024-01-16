@@ -43,9 +43,7 @@ cron.schedule("0 0 * * *", () => {
   });
   //reset database.json file
   fs.writeFileSync("database.json", JSON.stringify([]));
-}
-);
-
+});
 
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
@@ -155,8 +153,12 @@ app.post("/convert-file", async (req, res) => {
         await new Promise((resolve, reject) => {
           ffmpeg()
             .input(inputFile)
+            .outputOptions("-preset faster") // Nutzt einen schnelleren Preset für die Kodierung
             .output(outputFile)
             .on("end", resolve)
+            .on("progress", function (progress) {
+              console.log("progress: ", progress);
+            })
             .on("error", reject)
             .run();
         });
