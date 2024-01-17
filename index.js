@@ -132,24 +132,32 @@ app.post("/upload-file", upload.single("file"), async (req, res) => {
   }
 });
 
+const statusFilePath = path.join(__dirname, "status.json");
+
+// Initialisiere die Status-Datei, wenn sie nicht existiert
+if (!fs.existsSync(statusFilePath)) {
+  fs.writeFileSync(statusFilePath, JSON.stringify({}));
+}
+
 app.post("/convert-file", async (req, res) => {
   try {
     const file_id = req.body.file_id;
     const db = fs.readFileSync(path.join(__dirname, "database.json"));
     const dbData = JSON.parse(db);
     const fileData = dbData.find((data) => data.id == file_id);
-    console.log("fileData: ", fileData);
+
     if (fileData) {
       const inputFile = fileData.filepath;
       const fileName = fileData.filename.split(".").shift();
       const fileExtension = fileData.extension;
       const outputFile = __dirname + `/output/${fileName}.mp4`;
-      console.log("inputFile: ", inputFile);
-      console.log("fileName: ", fileName);
-      console.log("fileExtension: ", fileExtension);
-      console.log("outputFile: ", outputFile);
+
       if (fileExtension === "mpeg" || fileExtension === "mpg") {
-        // Convert the file to MP4 using FFmpeg
+        // Status-Update vor der Konvertierung
+        let statusData = JSON.parse(fs.readFileSync(statusFilePath));
+        statusData[file_id] = { status: "processing" };
+        fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
+
         await new Promise((resolve, reject) => {
           ffmpeg()
             .input(inputFile)
@@ -158,18 +166,23 @@ app.post("/convert-file", async (req, res) => {
             .audioCodec("libmp3lame")
             .audioBitrate("128k")
             .output(outputFile)
-            .on("end", resolve)
+            .on("end", () => {
+              statusData[file_id] = { status: "completed" };
+              fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
+              resolve();
+            })
             .on("progress", function (progress) {
               console.log("progress: ", progress);
             })
-            .on("error", reject)
+            .on("error", (err) => {
+              statusData[file_id] = { status: "error", error: err.message };
+              fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
+              reject(err);
+            })
             .run();
         });
 
-        //create public url for the file in output folder
         const publicUrl = `https://api.eliasenglen.de/output/${fileName}.mp4`;
-
-        // Return the download URL in the JSON response
         res.json({ fileUrl: publicUrl });
       } else {
         res
@@ -184,6 +197,17 @@ app.post("/convert-file", async (req, res) => {
   } catch (error) {
     console.error("An error occurred:", error);
     res.status(500).send("An error occurred during processing.");
+  }
+});
+
+app.get("/conversion-status/:file_id", (req, res) => {
+  const file_id = req.params.file_id;
+  const currentStatus = JSON.parse(fs.readFileSync(statusFilePath));
+
+  if (currentStatus[file_id]) {
+    res.json({ file_id: file_id, status: currentStatus[file_id] });
+  } else {
+    res.status(404).send("Status für angegebene Datei-ID nicht gefunden.");
   }
 });
 
