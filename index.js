@@ -167,7 +167,8 @@ app.post("/convert-file", async (req, res) => {
             .audioBitrate("128k")
             .output(outputFile)
             .on("end", () => {
-              statusData[file_id] = { status: "completed" };
+              const publicUrl = `https://api.eliasenglen.de/output/${fileName}.mp4`;
+              statusData[file_id] = { status: "completed", fileUrl: publicUrl };
               fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
               resolve();
             })
@@ -182,8 +183,7 @@ app.post("/convert-file", async (req, res) => {
             .run();
         });
 
-        const publicUrl = `https://api.eliasenglen.de/output/${fileName}.mp4`;
-        res.json({ fileUrl: publicUrl });
+        res.json({ message: "Konvertierung gestartet.", file_id: file_id });
       } else {
         res
           .status(400)
@@ -202,10 +202,13 @@ app.post("/convert-file", async (req, res) => {
 
 app.get("/conversion-status/:file_id", (req, res) => {
   const file_id = req.params.file_id;
-  const currentStatus = JSON.parse(fs.readFileSync(statusFilePath));
+  const statusData = JSON.parse(fs.readFileSync(statusFilePath));
 
-  if (currentStatus[file_id]) {
-    res.json({ file_id: file_id, status: currentStatus[file_id] });
+  if (statusData[file_id]) {
+    res.json({
+      status: statusData[file_id].status,
+      fileUrl: statusData[file_id].fileUrl || null,
+    });
   } else {
     res.status(404).send("Status für angegebene Datei-ID nicht gefunden.");
   }
