@@ -173,7 +173,7 @@ app.post("/convert-file", async (req, res) => {
               resolve();
             })
             .on("progress", function (progress) {
-              console.log("progress: ", progress);
+              console.log("progress: ", new Date().toLocaleDateString('de-DE') + ' - ' + progress.status);
             })
             .on("error", (err) => {
               statusData[file_id] = { status: "error", error: err.message };
