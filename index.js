@@ -153,10 +153,10 @@ app.post("/convert-file", async (req, res) => {
         await new Promise((resolve, reject) => {
           ffmpeg()
             .input(inputFile)
-            //reduce video size to 480p
-            .size("480x?")
             .videoCodec("libx264")
             .videoBitrate("1000k")
+            .audioCodec("libmp3lame")
+            .audioBitrate("128k")
             .output(outputFile)
             .on("end", resolve)
             .on("progress", function (progress) {
