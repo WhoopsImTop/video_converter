@@ -158,7 +158,7 @@ app.post("/convert-file", async (req, res) => {
         statusData[file_id] = { status: "processing" };
         fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
 
-        await new Promise((resolve, reject) => {
+        new Promise((resolve, reject) => {
           ffmpeg()
             .input(inputFile)
             .videoCodec("libx264")
