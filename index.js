@@ -43,6 +43,8 @@ cron.schedule("0 0 * * *", () => {
   });
   //reset database.json file
   fs.writeFileSync("database.json", JSON.stringify([]));
+  //reset status.json file
+  fs.writeFileSync("status.json", JSON.stringify({}));
 });
 
 app.post("/convert", upload.single("file"), (req, res) => {
@@ -173,7 +175,7 @@ app.post("/convert-file", async (req, res) => {
               resolve();
             })
             .on("progress", function (progress) {
-              console.log("progress: ", new Date().toLocaleDateString('de-DE') + ' - ' + progress.percent + '%');
+              console.log("progress: ", new Date().toLocaleString('de-DE') + ' - ' + progress.percent + '%');
             })
             .on("error", (err) => {
               statusData[file_id] = { status: "error", error: err.message };
