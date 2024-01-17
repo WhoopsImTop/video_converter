@@ -176,6 +176,10 @@ app.post("/convert-file", async (req, res) => {
             })
             .on("progress", function (progress) {
               console.log("progress: ", new Date().toLocaleString('de-DE') + ' - ' + progress.percent + '%');
+              // Status-Update während der Konvertierung
+              let statusData = JSON.parse(fs.readFileSync(statusFilePath));
+              statusData[file_id] = { status: "processing", progress: progress.percent };
+              fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
             })
             .on("error", (err) => {
               statusData[file_id] = { status: "error", error: err.message };
@@ -210,6 +214,8 @@ app.get("/conversion-status/:file_id", (req, res) => {
     res.json({
       status: statusData[file_id].status,
       fileUrl: statusData[file_id].fileUrl || null,
+      error: statusData[file_id].error || null,
+      progress: statusData[file_id].progress || null,
     });
   } else {
     res.status(404).send("Status für angegebene Datei-ID nicht gefunden.");
