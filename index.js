@@ -119,7 +119,7 @@ app.post("/upload-file", upload.single("file"), async (req, res) => {
     //save id, filename and extension in a database file
     const data = {
       id: file_id,
-      filename: file.originalname,
+      filename: sanitizeFileName(file.originalname),
       extension: file.originalname.split(".").pop(),
       filepath: filePath,
     };
@@ -160,9 +160,7 @@ app.post("/convert-file", async (req, res) => {
 
     if (fileData) {
       const inputFile = fileData.filepath;
-      let fileName = fileData.filename.split(".").shift();
-      filename = sanitizeFileName(fileData.filename);
-
+      const fileName = fileData.filename.split(".").shift();
       const fileExtension = fileData.extension;
       const outputFile = __dirname + `/output/${fileName}.mp4`;
 
