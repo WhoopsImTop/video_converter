@@ -142,11 +142,13 @@ if (!fs.existsSync(statusFilePath)) {
 }
 
 function sanitizeFileName(fileName) {
-  //replace special characters like ä, ö, ü, ß, and spaces with _ and remove all other special characters
   return fileName
-    .replace(/[äöüß]/g, "_")
-    .replace(/[^a-zA-Z0-9_.]/g, "")
-    .replace(/ /g, "_");
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/é/g, "e");
+    .replace(/\s/g, "_");
 }
 
 app.post("/convert-file", async (req, res) => {
