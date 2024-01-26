@@ -147,7 +147,7 @@ function sanitizeFileName(fileName) {
     .replace(/ö/g, "oe")
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
-    .replace(/é/g, "e");
+    .replace(/é/g, "e")
     .replace(/\s/g, "_");
 }
 
