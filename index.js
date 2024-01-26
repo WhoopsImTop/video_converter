@@ -108,19 +108,32 @@ app.post("/convert", upload.single("file"), (req, res) => {
   }
 });
 
+function replaceSpecialChars(filename) {
+  return filename
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/é/g, "e")
+    .replace(/[^\w\-\.]/g, "_");
+}
+
 app.post("/upload-file", upload.single("file"), async (req, res) => {
   try {
     const file = req.file;
-    //generate file id
+    // Dateiname mit Sonderzeichen ersetzen
+    const cleanedFilename = replaceSpecialChars(file.originalname);
+
+    // Generiere Datei-ID
     const file_id = Math.floor(Math.random() * 1000000000);
-    //get filepath of uploaded file
+    // Hole Dateipfad der hochgeladenen Datei
     const filePath = file.path;
 
-    //save id, filename and extension in a database file
+    // Speichere ID, Dateiname und Erweiterung in einer Datenbankdatei
     const data = {
       id: file_id,
-      filename: sanitizeFileName(file.originalname),
-      extension: file.originalname.split(".").pop(),
+      filename: cleanedFilename,
+      extension: cleanedFilename.split(".").pop(),
       filepath: filePath,
     };
     const db = fs.readFileSync(path.join(__dirname, "database.json"));
@@ -139,16 +152,6 @@ const statusFilePath = path.join(__dirname, "status.json");
 // Initialisiere die Status-Datei, wenn sie nicht existiert
 if (!fs.existsSync(statusFilePath)) {
   fs.writeFileSync(statusFilePath, JSON.stringify({}));
-}
-
-function sanitizeFileName(fileName) {
-  return fileName
-    .replace(/ä/g, "ae")
-    .replace(/ö/g, "oe")
-    .replace(/ü/g, "ue")
-    .replace(/ß/g, "ss")
-    .replace(/é/g, "e")
-    .replace(/\s/g, "_");
 }
 
 app.post("/convert-file", async (req, res) => {
