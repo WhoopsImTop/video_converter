@@ -191,11 +191,11 @@ app.post("/convert-file", async (req, res) => {
 
         res.json({ message: "Konvertierung gestartet.", file_id: file_id });
       } else {
-        res
-          .status(400)
-          .send(
-            "Unsupported file format. Only .mpeg and .mpg files are allowed."
-          );
+        //move file to output folder
+        fs.renameSync(inputFile, outputFile);
+        //send the public url of the file
+        const publicUrl = `https://api.eliasenglen.de/output/${fileName}.mp4`;
+        res.json({ message: "Datei ist bereits konvertiert.", fileUrl: publicUrl });
       }
     } else {
       res.status(400).send("File not found");
