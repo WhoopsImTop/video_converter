@@ -115,7 +115,7 @@ function replaceSpecialChars(filename) {
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
     .replace(/é/g, "e")
-    .replace(/ /g, "_");
+    .replace(/[^\w\-\.]/g, "_");
 }
 
 app.post("/upload-file", upload.single("file"), async (req, res) => {
