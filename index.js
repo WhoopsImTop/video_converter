@@ -158,9 +158,8 @@ app.post("/convert-file", async (req, res) => {
 
     if (fileData) {
       const inputFile = fileData.filepath;
-      const fileName = fileData.filename.split(".").shift();
-
-      const filename = sanitizeFileName(fileData.filename);
+      let fileName = fileData.filename.split(".").shift();
+      filename = sanitizeFileName(fileData.filename);
 
       const fileExtension = fileData.extension;
       const outputFile = __dirname + `/output/${fileName}.mp4`;
