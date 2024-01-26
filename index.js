@@ -141,6 +141,14 @@ if (!fs.existsSync(statusFilePath)) {
   fs.writeFileSync(statusFilePath, JSON.stringify({}));
 }
 
+function sanitizeFileName(fileName) {
+  //replace special characters like ä, ö, ü, ß, and spaces with _ and remove all other special characters
+  return fileName
+    .replace(/[äöüß]/g, "_")
+    .replace(/[^a-zA-Z0-9_.]/g, "")
+    .replace(/ /g, "_");
+}
+
 app.post("/convert-file", async (req, res) => {
   try {
     const file_id = req.body.file_id;
@@ -151,6 +159,9 @@ app.post("/convert-file", async (req, res) => {
     if (fileData) {
       const inputFile = fileData.filepath;
       const fileName = fileData.filename.split(".").shift();
+
+      const filename = sanitizeFileName(fileData.filename);
+
       const fileExtension = fileData.extension;
       const outputFile = __dirname + `/output/${fileName}.mp4`;
 
@@ -175,10 +186,19 @@ app.post("/convert-file", async (req, res) => {
               resolve();
             })
             .on("progress", function (progress) {
-              console.log("progress: ", new Date().toLocaleString('de-DE') + ' - ' + progress.percent + '%');
+              console.log(
+                "progress: ",
+                new Date().toLocaleString("de-DE") +
+                  " - " +
+                  progress.percent +
+                  "%"
+              );
               // Status-Update während der Konvertierung
               let statusData = JSON.parse(fs.readFileSync(statusFilePath));
-              statusData[file_id] = { status: "processing", progress: progress.percent };
+              statusData[file_id] = {
+                status: "processing",
+                progress: progress.percent,
+              };
               fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
             })
             .on("error", (err) => {
@@ -195,7 +215,10 @@ app.post("/convert-file", async (req, res) => {
         fs.renameSync(inputFile, outputFile);
         //send the public url of the file
         const publicUrl = `https://api.eliasenglen.de/output/${fileName}.mp4`;
-        res.json({ message: "Datei ist bereits konvertiert.", fileUrl: publicUrl });
+        res.json({
+          message: "Datei ist bereits konvertiert.",
+          fileUrl: publicUrl,
+        });
       }
     } else {
       res.status(400).send("File not found");
