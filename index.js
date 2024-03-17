@@ -165,9 +165,9 @@ app.post("/convert-file", async (req, res) => {
       const inputFile = fileData.filepath;
       const fileName = fileData.filename.split(".").shift();
       const fileExtension = fileData.extension;
-      const outputFile = __dirname + `/output/${fileName}.${fileExtension}`;
 
       if (fileExtension === "mpeg" || fileExtension === "mpg") {
+        const outputFile = __dirname + `/output/${fileName}.mp4`;
         // Status-Update vor der Konvertierung
         let statusData = JSON.parse(fs.readFileSync(statusFilePath));
         statusData[file_id] = { status: "processing" };
@@ -213,6 +213,7 @@ app.post("/convert-file", async (req, res) => {
 
         res.json({ message: "Konvertierung gestartet.", file_id: file_id });
       } else {
+        const outputFile = __dirname + `/output/${fileName}.${fileExtension}`;
         //move file to output folder
         fs.renameSync(inputFile, outputFile);
         //add file to status.json
@@ -223,7 +224,8 @@ app.post("/convert-file", async (req, res) => {
         };
         fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
         res.json({
-          message: "File was already in mp4 format or not supported. File moved to output folder.",
+          message:
+            "File was already in mp4 format or not supported. File moved to output folder.",
           file_id: file_id,
         });
       }
