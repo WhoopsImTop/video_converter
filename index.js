@@ -165,7 +165,7 @@ app.post("/convert-file", async (req, res) => {
       const inputFile = fileData.filepath;
       const fileName = fileData.filename.split(".").shift();
       const fileExtension = fileData.extension;
-      const outputFile = __dirname + `/output/${fileName}.mp4`;
+      const outputFile = __dirname + `/output/${fileName}.${fileExtension}`;
 
       if (fileExtension === "mpeg" || fileExtension === "mpg") {
         // Status-Update vor der Konvertierung
