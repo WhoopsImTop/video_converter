@@ -216,7 +216,7 @@ app.post("/convert-file", async (req, res) => {
         //move file to output folder
         fs.renameSync(inputFile, outputFile);
         //send the public url of the file
-        const publicUrl = `https://api.eliasenglen.de/output/${fileName}.mp4`;
+        const publicUrl = `https://api.eliasenglen.de/output/${fileName}.${fileExtension}`;
         res.json({
           message: "Datei ist bereits konvertiert.",
           fileUrl: publicUrl,
