@@ -215,11 +215,16 @@ app.post("/convert-file", async (req, res) => {
       } else {
         //move file to output folder
         fs.renameSync(inputFile, outputFile);
-        //send the public url of the file
-        const publicUrl = `https://api.eliasenglen.de/output/${fileName}.${fileExtension}`;
+        //add file to status.json
+        let statusData = JSON.parse(fs.readFileSync(statusFilePath));
+        statusData[file_id] = {
+          status: "completed",
+          fileUrl: `https://api.eliasenglen.de/output/${fileName}.${fileExtension}`,
+        };
+        fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
         res.json({
-          message: "Datei ist bereits konvertiert.",
-          fileUrl: publicUrl,
+          message: "File was already in mp4 format or not supported. File moved to output folder.",
+          file_id: file_id,
         });
       }
     } else {
