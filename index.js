@@ -301,7 +301,7 @@ function sendToClientServer(fileName, file_id) {
 
 function getGoogleReviews() {
   const url =
-    "https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=AIzaSyA9u-aKq-cUUNvGq0OM2Ebvta9IAzbg-G8&language=de";
+    "https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=AIzaSyA9u-aKq-cUUNvGq0OM2Ebvta9IAzbg-G8&language=de&reviews_sort=newest";
   const headers = {
     "Content-Type": "application/json",
     "Accept-Language": "de",
