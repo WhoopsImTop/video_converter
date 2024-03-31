@@ -45,6 +45,8 @@ cron.schedule("0 0 * * *", () => {
   fs.writeFileSync("database.json", JSON.stringify([]));
   //reset status.json file
   fs.writeFileSync("status.json", JSON.stringify({}));
+
+  getGoogleReviews();
 });
 
 app.post("/convert", upload.single("file"), (req, res) => {
@@ -254,6 +256,11 @@ app.get("/conversion-status/:file_id", (req, res) => {
   }
 });
 
+app.get("/google-reviews", (req, res) => {
+  const reviews = JSON.parse(fs.readFileSync("google_reviews.json"));
+  res.json(reviews);
+});
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -285,4 +292,16 @@ function sendToClientServer(fileName, file_id) {
     console.log(" Body : ", body);
     return body;
   });
+}
+
+function getGoogleReviews() {
+  const url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=AIzaSyA9u-aKq-cUUNvGq0OM2Ebvta9IAzbg-G8';
+  axios.get(url)
+    .then(response => {
+      //write the response to a file
+      fs.writeFileSync("google_reviews.json", JSON.stringify(response.data.result));
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
