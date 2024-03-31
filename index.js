@@ -257,9 +257,13 @@ app.get("/conversion-status/:file_id", (req, res) => {
 });
 
 app.get("/google-reviews", (req, res) => {
-  getGoogleReviews();
-  const reviews = JSON.parse(fs.readFileSync("google_reviews.json"));
-  res.json(reviews);
+  try {
+    const reviews = JSON.parse(fs.readFileSync("google_reviews.json"));
+    res.json(reviews);
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).send("An error occurred during processing.");
+  }
 });
 
 app.get("/", (req, res) => {
@@ -296,17 +300,22 @@ function sendToClientServer(fileName, file_id) {
 }
 
 function getGoogleReviews() {
-  const url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=AIzaSyA9u-aKq-cUUNvGq0OM2Ebvta9IAzbg-G8&language=de';
+  const url =
+    "https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=AIzaSyA9u-aKq-cUUNvGq0OM2Ebvta9IAzbg-G8&language=de";
   const headers = {
-    'Content-Type': 'application/json',
-    'Accept-Language': 'de'
+    "Content-Type": "application/json",
+    "Accept-Language": "de",
   };
-  axios.get(url)
-    .then(response => {
+  axios
+    .get(url)
+    .then((response) => {
       //write the response to a file
-      fs.writeFileSync("google_reviews.json", JSON.stringify(response.data.result));
+      fs.writeFileSync(
+        "google_reviews.json",
+        JSON.stringify(response.data.result)
+      );
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(error);
     });
 }
