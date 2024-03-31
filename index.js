@@ -258,7 +258,6 @@ app.get("/conversion-status/:file_id", (req, res) => {
 
 app.get("/google-reviews", (req, res) => {
   try {
-    getGoogleReviews();
     const reviews = JSON.parse(fs.readFileSync("google_reviews.json"));
     res.json(reviews);
   } catch (error) {
