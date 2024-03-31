@@ -258,6 +258,7 @@ app.get("/conversion-status/:file_id", (req, res) => {
 
 app.get("/google-reviews", (req, res) => {
   try {
+    getGoogleReviews();
     const reviews = JSON.parse(fs.readFileSync("google_reviews.json"));
     res.json(reviews);
   } catch (error) {
@@ -300,12 +301,11 @@ function sendToClientServer(fileName, file_id) {
 }
 
 function getGoogleReviews() {
+  const apiKey = process.env.MAPS_API_KEY;
   const url =
-    "https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=AIzaSyA9u-aKq-cUUNvGq0OM2Ebvta9IAzbg-G8&language=de&reviews_sort=newest";
-  const headers = {
-    "Content-Type": "application/json",
-    "Accept-Language": "de",
-  };
+    "https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=" +
+    apiKey +
+    "&language=de&reviews_sort=newest";
   axios
     .get(url)
     .then((response) => {
