@@ -257,6 +257,7 @@ app.get("/conversion-status/:file_id", (req, res) => {
 });
 
 app.get("/google-reviews", (req, res) => {
+  getGoogleReviews();
   const reviews = JSON.parse(fs.readFileSync("google_reviews.json"));
   res.json(reviews);
 });
@@ -295,7 +296,11 @@ function sendToClientServer(fileName, file_id) {
 }
 
 function getGoogleReviews() {
-  const url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=AIzaSyA9u-aKq-cUUNvGq0OM2Ebvta9IAzbg-G8';
+  const url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJty-wo7IbkUcRD8J7wDlPteg&fields=name,reviews,user_ratings_total&key=AIzaSyA9u-aKq-cUUNvGq0OM2Ebvta9IAzbg-G8&language=de';
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept-Language': 'de'
+  };
   axios.get(url)
     .then(response => {
       //write the response to a file
