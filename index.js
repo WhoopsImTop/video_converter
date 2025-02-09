@@ -49,6 +49,15 @@ cron.schedule("0 0 * * *", () => {
   getGoogleReviews();
 });
 
+cron.schedule("0 7 * * *", async () => {
+  try {
+    const response = await axios.get("https://barber-mo.com/api/appointments/sms-service");
+    console.log("GET-Request erfolgreich:", response.data);
+  } catch (error) {
+    console.error("Fehler beim GET-Request:", error.message);
+  }
+});
+
 app.post("/convert", upload.single("file"), (req, res) => {
   try {
     console.log("req.body: ", req.body);
