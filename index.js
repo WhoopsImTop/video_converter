@@ -51,7 +51,9 @@ cron.schedule("0 0 * * *", () => {
 
 cron.schedule("0 7 * * *", async () => {
   try {
-    const response = await axios.get("https://barber-mo.com/api/appointments/sms-service");
+    const response = await axios.get(
+      "https://barber-mo.com/api/appointments/sms-service"
+    );
     console.log("GET-Request erfolgreich:", response.data);
   } catch (error) {
     console.error("Fehler beim GET-Request:", error.message);
@@ -165,7 +167,7 @@ if (!fs.existsSync(statusFilePath)) {
   fs.writeFileSync(statusFilePath, JSON.stringify({}));
 }
 
-app.post("/convert-file", async (req, res) => {
+/* app.post("/convert-file", async (req, res) => {
   try {
     const file_id = req.body.file_id;
     const db = fs.readFileSync(path.join(__dirname, "database.json"));
@@ -242,6 +244,84 @@ app.post("/convert-file", async (req, res) => {
       }
     } else {
       res.status(400).send("File not found");
+    }
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).send("An error occurred during processing.");
+  }
+}); */
+
+app.post("/convert-file", async (req, res) => {
+  try {
+    const file_id = req.body.file_id;
+    const db = fs.readFileSync(path.join(__dirname, "database.json"));
+    const dbData = JSON.parse(db);
+    const fileData = dbData.find((data) => data.id == file_id);
+
+    if (!fileData) {
+      return res.status(400).send("File not found");
+    }
+
+    const inputFile = fileData.filepath;
+    const fileName = fileData.filename.split(".").shift();
+    const fileExtension = fileData.extension.toLowerCase();
+
+    const outputFile = __dirname + `/output/${fileName}.mp4`;
+    const outputUrl = `https://api.eliasenglen.de/output/${fileName}.mp4`;
+    let statusData = JSON.parse(fs.readFileSync(statusFilePath));
+
+    if (fileExtension !== "mp4") {
+      statusData[file_id] = { status: "processing" };
+      fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
+
+      new Promise((resolve, reject) => {
+        ffmpeg()
+          .input(inputFile)
+          .videoCodec("libx264")
+          .videoBitrate("1000k")
+          .audioCodec("libmp3lame")
+          .audioBitrate("128k")
+          .output(outputFile)
+          .on("end", () => {
+            statusData[file_id] = { status: "completed", fileUrl: outputUrl };
+            fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
+            resolve();
+          })
+          .on("progress", (progress) => {
+            console.log(
+              "progress: ",
+              new Date().toLocaleString("de-DE") +
+                " - " +
+                progress.percent +
+                "%"
+            );
+            statusData[file_id] = {
+              status: "processing",
+              progress: progress.percent,
+            };
+            fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
+          })
+          .on("error", (err) => {
+            statusData[file_id] = { status: "error", error: err.message };
+            fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
+            reject(err);
+          })
+          .run();
+      });
+
+      res.json({ message: "Konvertierung gestartet.", file_id: file_id });
+    } else {
+      // Datei ist bereits im mp4-Format, einfach verschieben
+      const finalOutput = __dirname + `/output/${fileName}.mp4`;
+      fs.renameSync(inputFile, finalOutput);
+      statusData[file_id] = { status: "completed", fileUrl: outputUrl };
+      fs.writeFileSync(statusFilePath, JSON.stringify(statusData));
+
+      res.json({
+        message:
+          "Datei war bereits im mp4-Format. Verschoben in Output-Ordner.",
+        file_id: file_id,
+      });
     }
   } catch (error) {
     console.error("An error occurred:", error);
